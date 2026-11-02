@@ -4,7 +4,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { profileQuery, withdrawalsQuery, settingsQuery } from "@/lib/queries";
+import { useLang } from "@/lib/i18n";
+import { profileQuery, withdrawalsQuery, settingsQuery, depositsQuery, investmentsQuery } from "@/lib/queries";
 import { usd, shortDate, num } from "@/lib/format";
 import { cryptoNetworks, bankCountries } from "@/lib/deposit";
 import { PageHeader } from "@/components/app/PageHeader";
@@ -29,9 +30,12 @@ type Method = (typeof methods)[number];
 
 function Withdraw() {
   const { user } = useAuth();
+  const { t, lang } = useLang();
   const qc = useQueryClient();
   const { data: profile } = useQuery(profileQuery(user?.id));
   const { data: requests = [] } = useQuery(withdrawalsQuery(user?.id));
+  const { data: deposits = [] } = useQuery(depositsQuery(user?.id));
+  const { data: investments = [] } = useQuery(investmentsQuery(user?.id));
   const { data: settings } = useQuery(settingsQuery);
   const [amount, setAmount] = useState(100);
   const [method, setMethod] = useState<Method>("Crypto");
@@ -39,6 +43,10 @@ function Withdraw() {
   const [country, setCountry] = useState(bankCountries[0]!);
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const hasHistory = deposits.length > 0 || investments.length > 0;
+  const feePct = num(profile?.withdrawal_fee_pct ?? 0);
+  const fee = Math.round(amount * feePct) / 100;
 
   const minWithdrawal = num(
     (settings?.["platform"] as { min_withdrawal?: number } | undefined)?.["min_withdrawal"] ?? 0,
@@ -57,6 +65,7 @@ function Withdraw() {
       _amount: amount,
       _method: fullMethod,
       _destination: destination,
+      _lang: lang,
     });
     setBusy(false);
     if (error) {
@@ -74,6 +83,12 @@ function Withdraw() {
         title="Withdraw"
         subtitle={`Available: ${usd(profile?.wallet_balance)} · minimum ${usd(minWithdrawal)}`}
       />
+
+      {!hasHistory && (
+        <p className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {t("withdraw.mustInvest")}
+        </p>
+      )}
 
       <form onSubmit={submit} className="surface-card grid gap-4 rounded-2xl p-5 sm:grid-cols-2">
         <div className="space-y-2">
@@ -168,7 +183,17 @@ function Withdraw() {
             required
           />
         </div>
-        <Button type="submit" variant="hero" className="sm:col-span-2" disabled={busy}>
+        <p className="text-xs text-muted-foreground sm:col-span-2">
+          {feePct > 0
+            ? `${t("withdraw.fee")}: ${feePct}% · ${t("withdraw.receive")}: ${usd(Math.max(0, amount - fee))}`
+            : ""}
+        </p>
+        <Button
+          type="submit"
+          variant="hero"
+          className="sm:col-span-2"
+          disabled={busy || !hasHistory}
+        >
           {busy ? "Submitting…" : `Request ${usd(amount)}`}
         </Button>
         <p className="text-xs text-muted-foreground sm:col-span-2">
