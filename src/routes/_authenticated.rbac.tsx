@@ -355,7 +355,7 @@ function Members({ isAdmin }: { isAdmin: boolean }) {
         className="mb-4 max-w-sm"
       />
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] text-sm">
+        <table className="w-full min-w-[860px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs tracking-wide text-muted-foreground uppercase">
               <th className="px-3 py-2 font-medium">Member</th>
