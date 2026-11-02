@@ -98,6 +98,13 @@ export const dict = {
     en: "Terravest is a demonstration investment platform. Returns shown are illustrative and capital is at risk.",
   },
 
+  "withdraw.mustInvest": {
+    de: "Bitte investieren Sie zuerst, bevor Sie eine Auszahlung anfordern.",
+    en: "Please invest first before you withdraw.",
+  },
+  "withdraw.fee": { de: "Auszahlungsgebühr", en: "Withdrawal fee" },
+  "withdraw.receive": { de: "Sie erhalten", en: "You receive" },
+
   "auth.welcome": { de: "Willkommen zurück", en: "Welcome back" },
   "auth.open": { de: "Konto eröffnen", en: "Open your account" },
   "auth.signinSub": { de: "Melden Sie sich bei Wallet und Positionen an.", en: "Sign in to your wallet and positions." },

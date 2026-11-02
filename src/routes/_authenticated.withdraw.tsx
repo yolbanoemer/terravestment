@@ -183,7 +183,17 @@ function Withdraw() {
             required
           />
         </div>
-        <Button type="submit" variant="hero" className="sm:col-span-2" disabled={busy}>
+        <p className="text-xs text-muted-foreground sm:col-span-2">
+          {feePct > 0
+            ? `${t("withdraw.fee")}: ${feePct}% · ${t("withdraw.receive")}: ${usd(Math.max(0, amount - fee))}`
+            : ""}
+        </p>
+        <Button
+          type="submit"
+          variant="hero"
+          className="sm:col-span-2"
+          disabled={busy || !hasHistory}
+        >
           {busy ? "Submitting…" : `Request ${usd(amount)}`}
         </Button>
         <p className="text-xs text-muted-foreground sm:col-span-2">
