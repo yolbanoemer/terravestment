@@ -214,6 +214,7 @@ export type Database = {
           updated_at: string
           username: string
           wallet_balance: number
+          withdrawal_fee_pct: number
         }
         Insert: {
           avatar_url?: string | null
@@ -226,6 +227,7 @@ export type Database = {
           updated_at?: string
           username: string
           wallet_balance?: number
+          withdrawal_fee_pct?: number
         }
         Update: {
           avatar_url?: string | null
@@ -238,6 +240,7 @@ export type Database = {
           updated_at?: string
           username?: string
           wallet_balance?: number
+          withdrawal_fee_pct?: number
         }
         Relationships: []
       }
@@ -343,6 +346,7 @@ export type Database = {
           amount: number
           created_at: string
           destination: string
+          fee_amount: number
           id: string
           method: string
           status: Database["public"]["Enums"]["withdrawal_status"]
@@ -354,6 +358,7 @@ export type Database = {
           amount: number
           created_at?: string
           destination: string
+          fee_amount?: number
           id?: string
           method: string
           status?: Database["public"]["Enums"]["withdrawal_status"]
@@ -365,6 +370,7 @@ export type Database = {
           amount?: number
           created_at?: string
           destination?: string
+          fee_amount?: number
           id?: string
           method?: string
           status?: Database["public"]["Enums"]["withdrawal_status"]
@@ -433,10 +439,20 @@ export type Database = {
         }
         Returns: string
       }
-      request_withdrawal: {
-        Args: { _amount: number; _destination: string; _method: string }
-        Returns: string
-      }
+      request_withdrawal:
+        | {
+            Args: { _amount: number; _destination: string; _method: string }
+            Returns: string
+          }
+        | {
+            Args: {
+              _amount: number
+              _destination: string
+              _lang?: string
+              _method: string
+            }
+            Returns: string
+          }
       resolve_deposit: {
         Args: {
           _id: string
