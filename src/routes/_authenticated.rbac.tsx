@@ -333,6 +333,19 @@ function Members({ isAdmin }: { isAdmin: boolean }) {
     qc.invalidateQueries();
   }
 
+  async function setFee(userId: string, feePct: number) {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ withdrawal_fee_pct: Math.max(0, Number.isFinite(feePct) ? feePct : 0) })
+      .eq("id", userId);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Withdrawal fee updated");
+    qc.invalidateQueries();
+  }
+
   return (
     <Panel>
       <Input
@@ -348,6 +361,7 @@ function Members({ isAdmin }: { isAdmin: boolean }) {
               <th className="px-3 py-2 font-medium">Member</th>
               <th className="px-3 py-2 font-medium">Joined</th>
               <th className="px-3 py-2 text-right font-medium">Wallet</th>
+              <th className="px-3 py-2 text-right font-medium">Fee %</th>
               <th className="px-3 py-2 font-medium">Role</th>
               <th className="px-3 py-2 text-right font-medium">Actions</th>
             </tr>
@@ -364,6 +378,20 @@ function Members({ isAdmin }: { isAdmin: boolean }) {
                 </td>
                 <td className="px-3 py-2 text-muted-foreground">{shortDate(p.created_at)}</td>
                 <td className="px-3 py-2 text-right">{usd(p.wallet_balance)}</td>
+                <td className="px-3 py-2 text-right">
+                  {isAdmin ? (
+                    <Input
+                      className="ml-auto h-8 w-20"
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      defaultValue={p.withdrawal_fee_pct}
+                      onBlur={(e) => setFee(p.id, Number(e.target.value))}
+                    />
+                  ) : (
+                    <span className="text-xs text-muted-foreground">{p.withdrawal_fee_pct}%</span>
+                  )}
+                </td>
                 <td className="px-3 py-2">
                   {isAdmin ? (
                     <select
@@ -744,6 +772,11 @@ function Payouts() {
               <p className="text-xs text-muted-foreground">
                 {w.method} · {w.destination} · {shortDate(w.created_at)}
               </p>
+              {num(w.fee_amount) > 0 && (
+                <p className="text-xs text-warning">
+                  Withdrawal fee deducted: {usd(w.fee_amount)}
+                </p>
+              )}
             </div>
             {w.status === "pending" ? (
               <div className="flex gap-2">
