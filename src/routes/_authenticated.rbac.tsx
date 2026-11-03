@@ -641,6 +641,8 @@ function MemberHistory() {
 
 function Positions() {
   const { data: investments = [] } = useQuery(allInvestmentsQuery);
+  const { data: profiles = [] } = useQuery(allProfilesQuery);
+  const uname = (id: string) => "@" + (profiles.find((p) => p.id === id)?.username ?? "—");
   return (
     <Panel>
       <div className="overflow-x-auto">
@@ -659,9 +661,7 @@ function Positions() {
           <tbody>
             {investments.map((i) => (
               <tr key={i.id} className="border-b border-border/60 last:border-0">
-                <td className="px-3 py-2">
-                  @{(i.profiles as { username?: string } | null)?.username ?? "—"}
-                </td>
+                <td className="px-3 py-2">{uname(i.user_id)}</td>
                 <td className="px-3 py-2">
                   {(i.plans as { name?: string } | null)?.name ?? `${i.lock_days}d`}
                 </td>
@@ -684,6 +684,8 @@ function Positions() {
 function Deposits() {
   const qc = useQueryClient();
   const { data: deposits = [] } = useQuery(allDepositsQuery);
+  const { data: profiles = [] } = useQuery(allProfilesQuery);
+  const uname = (id: string) => "@" + (profiles.find((p) => p.id === id)?.username ?? "—");
 
   async function resolve(id: string, status: "confirmed" | "rejected") {
     const note =
@@ -712,7 +714,7 @@ function Deposits() {
           <li key={d.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div className="min-w-0">
               <p className="text-sm font-medium">
-                {usd(d.amount)} · @{(d.profiles as { username?: string } | null)?.username ?? "—"}
+                {usd(d.amount)} · {uname(d.user_id)}
               </p>
               <p className="truncate text-xs text-muted-foreground">
                 {d.method} · {d.asset} · {d.reference ?? "no reference"} · {shortDate(d.created_at)}
@@ -740,6 +742,8 @@ function Deposits() {
 function Payouts() {
   const qc = useQueryClient();
   const { data: withdrawals = [] } = useQuery(allWithdrawalsQuery);
+  const { data: profiles = [] } = useQuery(allProfilesQuery);
+  const uname = (id: string) => "@" + (profiles.find((p) => p.id === id)?.username ?? "—");
 
   async function resolve(id: string, status: string) {
     const note = status === "rejected" ? window.prompt("Reason for rejection:", "") : null;
@@ -767,7 +771,7 @@ function Payouts() {
           <li key={w.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div>
               <p className="text-sm font-medium">
-                {usd(w.amount)} · @{(w.profiles as { username?: string } | null)?.username ?? "—"}
+                {usd(w.amount)} · {uname(w.user_id)}
               </p>
               <p className="text-xs text-muted-foreground">
                 {w.method} · {w.destination} · {shortDate(w.created_at)}
@@ -869,6 +873,8 @@ function Announcements() {
 function Tickets() {
   const qc = useQueryClient();
   const { data: tickets = [] } = useQuery(allTicketsQuery);
+  const { data: profiles = [] } = useQuery(allProfilesQuery);
+  const uname = (id: string) => "@" + (profiles.find((p) => p.id === id)?.username ?? "—");
 
   async function reply(id: string) {
     const text = window.prompt("Reply to member:", "");
@@ -895,7 +901,7 @@ function Tickets() {
               <p className="text-sm font-medium">
                 {t.subject}{" "}
                 <span className="text-xs text-muted-foreground">
-                  @{(t.profiles as { username?: string } | null)?.username ?? "—"} · {t.category}
+                  {uname(t.user_id)} · {t.category}
                 </span>
               </p>
               <p className="text-xs text-muted-foreground">{t.description}</p>
