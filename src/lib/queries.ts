@@ -177,7 +177,7 @@ export const allInvestmentsQuery = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("investments")
-      .select("*, profiles:user_id(username), plans(name)")
+      .select("*, plans(name)")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw error;
