@@ -202,8 +202,8 @@ export const allWithdrawalsQuery = queryOptions({
   queryKey: ["admin", "withdrawals"],
   queryFn: async () => {
     const { data, error } = await supabase
-      .from("withdrawals")
-      .select("*, profiles:user_id(username)")
+        .from("withdrawals")
+        .select("*")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw error;
@@ -215,8 +215,8 @@ export const allTicketsQuery = queryOptions({
   queryKey: ["admin", "tickets"],
   queryFn: async () => {
     const { data, error } = await supabase
-      .from("support_tickets")
-      .select("*, profiles:user_id(username)")
+        .from("support_tickets")
+        .select("*")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw error;
@@ -243,8 +243,8 @@ export const allDepositsQuery = queryOptions({
   queryKey: ["admin", "deposits"],
   queryFn: async () => {
     const { data, error } = await supabase
-      .from("deposits")
-      .select("*, profiles:user_id(username)")
+        .from("deposits")
+        .select("*")
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw error;
