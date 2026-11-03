@@ -6,3 +6,6 @@
 - [x] Add protected investment date correction.
 - [x] Change the welcome announcement date to 2007.
 - [x] Validate mobile access and member restrictions.
+- [x] Block withdrawals until the member has funded or invested, with the message localized (German/English).
+- [x] Let admins set a per-member withdrawal fee (%), deducted when a payout is approved.
+- [x] Fix control-room lists (payouts, deposits, positions, tickets) that failed to load member names.
