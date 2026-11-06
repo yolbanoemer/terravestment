@@ -54,11 +54,11 @@ function DepositPage() {
   const [busy, setBusy] = useState(false);
 
   const selectedCoin = cryptoNetworks.find((c) => c.code === coin)!;
-  const hasConfirmedDeposit = deposits.some((deposit) => deposit.status === "confirmed");
+  const hasAnyDeposit = deposits.length > 0;
   const fundingRequirements = getFundingRequirements(
     Number(profile?.wallet_balance ?? 0),
     lang,
-    hasConfirmedDeposit,
+    hasAnyDeposit,
   );
   const minDeposit = fundingRequirements.firstDepositMinimum || 1;
 
@@ -75,11 +75,10 @@ function DepositPage() {
       _method: method,
       _amount: amount,
       _asset: method === "crypto" ? selectedCoin.code : fundingRequirements.depositCurrency,
+      _country: "",
+      _destination: method === "crypto" ? selectedCoin.address : paypalEmail,
+      _reference: reference,
       _lang: lang,
-      ...(method === "crypto"
-        ? { _destination: selectedCoin.address }
-        : { _destination: paypalEmail }),
-      ...(reference ? { _reference: reference } : {}),
     });
     setBusy(false);
     if (error) {
@@ -137,7 +136,7 @@ function DepositPage() {
               onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
               required
             />
-            {!hasConfirmedDeposit && (
+            {!hasAnyDeposit && (
               <p className="text-xs text-muted-foreground">
                 {fundingRequirements.firstDepositMinimum === 200
                   ? t("deposit.highBalanceMinimum")

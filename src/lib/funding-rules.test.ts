@@ -27,7 +27,7 @@ describe("first-deposit and withdrawal rules", () => {
     expect(getFundingRequirements(10_001, "de", false).firstDepositMinimum).toBe(200);
   });
 
-  it("allows withdrawal only after a confirmed deposit, regardless of investments", () => {
+  it("allows withdrawal after a deposit request regardless of its confirmation or investment history", () => {
     expect(getFundingRequirements(500, "en", false).canWithdraw).toBe(false);
     expect(getFundingRequirements(500, "en", true).canWithdraw).toBe(true);
   });

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { resolvePreferredLanguage } from "@/lib/language-preference";
+import { getVisitorCountry } from "@/lib/language.functions";
 
 export type Lang = "de" | "en";
 
@@ -164,8 +165,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
-    fetch("https://ipapi.co/country/")
-      .then((response) => (response.ok ? response.text() : ""))
+    getVisitorCountry()
       .then((countryCode) => {
         if (!cancelled) setLangState(resolvePreferredLanguage(null, countryCode));
       })
