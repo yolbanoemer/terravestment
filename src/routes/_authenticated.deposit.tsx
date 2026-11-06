@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { depositsQuery, profileQuery } from "@/lib/queries";
 import { usd, shortDate } from "@/lib/format";
+import { useLang } from "@/lib/i18n";
+import { getFundingRequirements } from "@/lib/funding-rules";
 import { cryptoNetworks, bankCountries } from "@/lib/deposit";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -38,6 +40,7 @@ const methodMeta: { key: Method; label: string; icon: typeof Wallet; hint: strin
 
 function DepositPage() {
   const { user } = useAuth();
+  const { lang, t } = useLang();
   const qc = useQueryClient();
   const { data: profile } = useQuery(profileQuery(user?.id));
   const { data: deposits = [] } = useQuery(depositsQuery(user?.id));
@@ -51,6 +54,13 @@ function DepositPage() {
   const [busy, setBusy] = useState(false);
 
   const selectedCoin = cryptoNetworks.find((c) => c.code === coin)!;
+  const hasConfirmedDeposit = deposits.some((deposit) => deposit.status === "confirmed");
+  const fundingRequirements = getFundingRequirements(
+    Number(profile?.wallet_balance ?? 0),
+    lang,
+    hasConfirmedDeposit,
+  );
+  const minDeposit = fundingRequirements.firstDepositMinimum || 1;
 
   async function copy(text: string) {
     await navigator.clipboard.writeText(text);
@@ -64,7 +74,8 @@ function DepositPage() {
     const { error } = await supabase.rpc("request_deposit", {
       _method: method,
       _amount: amount,
-      _asset: method === "crypto" ? selectedCoin.code : "USD",
+      _asset: method === "crypto" ? selectedCoin.code : fundingRequirements.depositCurrency,
+      _lang: lang,
       ...(method === "crypto"
         ? { _destination: selectedCoin.address }
         : { _destination: paypalEmail }),
@@ -117,15 +128,22 @@ function DepositPage() {
       <form onSubmit={submit} className="surface-card mt-6 space-y-5 rounded-2xl p-5">
         {method !== "bank" && (
           <div className="max-w-xs space-y-2">
-            <Label htmlFor="dep-amount">Amount in USD</Label>
+            <Label htmlFor="dep-amount">{t("deposit.amount")}</Label>
             <Input
               id="dep-amount"
               type="number"
-              min={1}
+              min={minDeposit}
               value={amount}
               onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
               required
             />
+            {!hasConfirmedDeposit && (
+              <p className="text-xs text-muted-foreground">
+                {fundingRequirements.firstDepositMinimum === 200
+                  ? t("deposit.highBalanceMinimum")
+                  : t("deposit.firstMinimum").replace("{amount}", String(minDeposit))}
+              </p>
+            )}
           </div>
         )}
 

@@ -98,12 +98,21 @@ export const dict = {
     en: "Terravest is a demonstration investment platform. Returns shown are illustrative and capital is at risk.",
   },
 
-  "withdraw.mustInvest": {
-    de: "Bitte investieren Sie zuerst, bevor Sie eine Auszahlung anfordern.",
-    en: "Please invest first before you withdraw.",
+  "withdraw.mustDeposit": {
+    de: "Bitte zahlen Sie zuerst Geld ein, bevor Sie eine Auszahlung anfordern.",
+    en: "Please deposit funds first before requesting a withdrawal.",
   },
   "withdraw.fee": { de: "Auszahlungsgebühr", en: "Withdrawal fee" },
   "withdraw.receive": { de: "Sie erhalten", en: "You receive" },
+  "deposit.amount": { de: "Betrag (EUR)", en: "Amount (USD)" },
+  "deposit.firstMinimum": {
+    de: "Ihre erste Einzahlung muss mindestens {amount} EUR betragen.",
+    en: "Your first deposit must be at least {amount} USD.",
+  },
+  "deposit.highBalanceMinimum": {
+    de: "Bei einem Guthaben über 10.000 ist für die erste Einzahlung ein Betrag zwischen 200 und 300 EUR vorgesehen.",
+    en: "With a balance above 10,000, the suggested first-deposit range is $200–$300.",
+  },
 
   "auth.welcome": { de: "Willkommen zurück", en: "Welcome back" },
   "auth.open": { de: "Konto eröffnen", en: "Open your account" },
@@ -144,11 +153,28 @@ const LangContext = createContext<{
 }>({ lang: "de", setLang: () => {}, t: (k) => dict[k].de });
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("de");
+  const [lang, setLangState] = useState<Lang>("en");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "en" || stored === "de") setLangState(stored);
+    if (stored === "en" || stored === "de") {
+      setLangState(stored);
+      return;
+    }
+
+    let cancelled = false;
+    fetch("https://ipapi.co/country/")
+      .then((response) => (response.ok ? response.text() : ""))
+      .then((countryCode) => {
+        if (!cancelled) setLangState(countryCode.trim().toUpperCase() === "DE" ? "de" : "en");
+      })
+      .catch(() => {
+        if (!cancelled) setLangState("en");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
