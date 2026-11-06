@@ -8,6 +8,13 @@
       "when": 1793616081517,
       "tag": "0000_withdrawal_rules",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793972349640,
+      "tag": "0001_deposit_first_minimums",
+      "breakpoints": true
     }
   ]
 }
