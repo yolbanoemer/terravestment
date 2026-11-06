@@ -428,17 +428,30 @@ export type Database = {
         Args: { _amount: number; _asset?: string; _plan_id: string }
         Returns: string
       }
-      request_deposit: {
-        Args: {
-          _amount: number
-          _asset?: string
-          _country?: string
-          _destination?: string
-          _method: Database["public"]["Enums"]["deposit_method"]
-          _reference?: string
-        }
-        Returns: string
-      }
+      request_deposit:
+        | {
+            Args: {
+              _amount: number
+              _asset?: string
+              _country?: string
+              _destination?: string
+              _method: Database["public"]["Enums"]["deposit_method"]
+              _reference?: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _amount: number
+              _asset: string
+              _country: string
+              _destination: string
+              _lang: string
+              _method: Database["public"]["Enums"]["deposit_method"]
+              _reference: string
+            }
+            Returns: string
+          }
       request_withdrawal:
         | {
             Args: { _amount: number; _destination: string; _method: string }

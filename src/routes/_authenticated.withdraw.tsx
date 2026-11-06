@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useLang } from "@/lib/i18n";
-import { profileQuery, withdrawalsQuery, settingsQuery, depositsQuery, investmentsQuery } from "@/lib/queries";
+import { profileQuery, withdrawalsQuery, settingsQuery, depositsQuery } from "@/lib/queries";
 import { usd, shortDate, num } from "@/lib/format";
 import { cryptoNetworks, bankCountries } from "@/lib/deposit";
 import { PageHeader } from "@/components/app/PageHeader";
@@ -35,7 +35,6 @@ function Withdraw() {
   const { data: profile } = useQuery(profileQuery(user?.id));
   const { data: requests = [] } = useQuery(withdrawalsQuery(user?.id));
   const { data: deposits = [] } = useQuery(depositsQuery(user?.id));
-  const { data: investments = [] } = useQuery(investmentsQuery(user?.id));
   const { data: settings } = useQuery(settingsQuery);
   const [amount, setAmount] = useState(100);
   const [method, setMethod] = useState<Method>("Crypto");
@@ -44,7 +43,7 @@ function Withdraw() {
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const hasHistory = deposits.length > 0 || investments.length > 0;
+  const hasDeposit = deposits.length > 0;
   const feePct = num(profile?.withdrawal_fee_pct ?? 0);
   const fee = Math.round(amount * feePct) / 100;
 
@@ -84,9 +83,9 @@ function Withdraw() {
         subtitle={`Available: ${usd(profile?.wallet_balance)} · minimum ${usd(minWithdrawal)}`}
       />
 
-      {!hasHistory && (
+      {!hasDeposit && (
         <p className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          {t("withdraw.mustInvest")}
+          {t("withdraw.mustDeposit")}
         </p>
       )}
 
@@ -192,7 +191,7 @@ function Withdraw() {
           type="submit"
           variant="hero"
           className="sm:col-span-2"
-          disabled={busy || !hasHistory}
+          disabled={busy || !hasDeposit}
         >
           {busy ? "Submitting…" : `Request ${usd(amount)}`}
         </Button>
