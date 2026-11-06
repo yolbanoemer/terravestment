@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { getFundingRequirements } from "./funding-rules";
+import { resolvePreferredLanguage } from "./language-preference";
 
 describe("first-deposit and withdrawal rules", () => {
   it("requires a $100 first deposit for English accounts below the high-balance threshold", () => {
@@ -29,5 +30,15 @@ describe("first-deposit and withdrawal rules", () => {
   it("allows withdrawal only after a confirmed deposit, regardless of investments", () => {
     expect(getFundingRequirements(500, "en", false).canWithdraw).toBe(false);
     expect(getFundingRequirements(500, "en", true).canWithdraw).toBe(true);
+  });
+
+  it("defaults to German for a German IP country and English otherwise", () => {
+    expect(resolvePreferredLanguage(null, "DE")).toBe("de");
+    expect(resolvePreferredLanguage(null, "US")).toBe("en");
+  });
+
+  it("always preserves a saved language over IP country", () => {
+    expect(resolvePreferredLanguage("en", "DE")).toBe("en");
+    expect(resolvePreferredLanguage("de", "US")).toBe("de");
   });
 });

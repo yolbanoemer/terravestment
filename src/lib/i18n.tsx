@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { resolvePreferredLanguage } from "@/lib/language-preference";
 
 export type Lang = "de" | "en";
 
@@ -158,7 +159,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored === "en" || stored === "de") {
-      setLangState(stored);
+      setLangState(resolvePreferredLanguage(stored, ""));
       return;
     }
 
@@ -166,7 +167,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     fetch("https://ipapi.co/country/")
       .then((response) => (response.ok ? response.text() : ""))
       .then((countryCode) => {
-        if (!cancelled) setLangState(countryCode.trim().toUpperCase() === "DE" ? "de" : "en");
+        if (!cancelled) setLangState(resolvePreferredLanguage(null, countryCode));
       })
       .catch(() => {
         if (!cancelled) setLangState("en");
