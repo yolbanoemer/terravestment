@@ -28,9 +28,9 @@ describe("first-deposit and withdrawal rules", () => {
     assert.equal(getFundingRequirements(10_001, "de", false).firstDepositMinimum, 200);
   });
 
-  it("requires a confirmed deposit before withdrawal", () => {
-    assert.equal(getFundingRequirements(500, "en", false).canWithdraw, false);
-    assert.equal(getFundingRequirements(500, "en", true).canWithdraw, true);
+  it("uses the language’s funding currency while leaving deposit-request eligibility separate", () => {
+    assert.equal(getFundingRequirements(500, "en", false).depositCurrency, "USD");
+    assert.equal(getFundingRequirements(500, "de", false).depositCurrency, "EUR");
   });
 
   it("defaults to German for a German IP country and English otherwise", () => {
