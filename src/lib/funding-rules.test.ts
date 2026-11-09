@@ -28,7 +28,7 @@ describe("first-deposit and withdrawal rules", () => {
     assert.equal(getFundingRequirements(10_001, "de", false).firstDepositMinimum, 200);
   });
 
-  it("allows withdrawal after a deposit request regardless of its confirmation or investment history", () => {
+  it("requires a confirmed deposit before withdrawal", () => {
     assert.equal(getFundingRequirements(500, "en", false).canWithdraw, false);
     assert.equal(getFundingRequirements(500, "en", true).canWithdraw, true);
   });

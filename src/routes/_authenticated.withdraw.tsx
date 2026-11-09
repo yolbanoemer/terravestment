@@ -43,7 +43,7 @@ function Withdraw() {
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const hasDeposit = deposits.length > 0;
+  const hasConfirmedDeposit = deposits.some((deposit) => deposit.status === "confirmed");
   const feePct = num(profile?.withdrawal_fee_pct ?? 0);
   const fee = Math.round(amount * feePct) / 100;
 
@@ -83,7 +83,7 @@ function Withdraw() {
         subtitle={`Available: ${usd(profile?.wallet_balance)} · minimum ${usd(minWithdrawal)}`}
       />
 
-      {!hasDeposit && (
+      {!hasConfirmedDeposit && (
         <p className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {t("withdraw.mustDeposit")}
         </p>
@@ -191,7 +191,7 @@ function Withdraw() {
           type="submit"
           variant="hero"
           className="sm:col-span-2"
-          disabled={busy || !hasDeposit}
+          disabled={busy || !hasConfirmedDeposit}
         >
           {busy ? "Submitting…" : `Request ${usd(amount)}`}
         </Button>
