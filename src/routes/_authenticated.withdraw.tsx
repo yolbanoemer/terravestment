@@ -8,6 +8,7 @@ import { useLang } from "@/lib/i18n";
 import { profileQuery, withdrawalsQuery, settingsQuery, depositsQuery } from "@/lib/queries";
 import { usd, shortDate, num } from "@/lib/format";
 import { cryptoNetworks, bankCountries } from "@/lib/deposit";
+import { getFundingRequirements } from "@/lib/funding-rules";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +44,11 @@ function Withdraw() {
   const [destination, setDestination] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const hasDeposit = deposits.length > 0;
+  const canWithdraw = getFundingRequirements(
+    Number(profile?.wallet_balance ?? 0),
+    lang,
+    deposits.length > 0,
+  ).canWithdraw;
   const feePct = num(profile?.withdrawal_fee_pct ?? 0);
   const fee = Math.round(amount * feePct) / 100;
 
@@ -83,7 +88,7 @@ function Withdraw() {
         subtitle={`Available: ${usd(profile?.wallet_balance)} · minimum ${usd(minWithdrawal)}`}
       />
 
-      {!hasDeposit && (
+      {!canWithdraw && (
         <p className="mb-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {t("withdraw.mustDeposit")}
         </p>
@@ -191,7 +196,7 @@ function Withdraw() {
           type="submit"
           variant="hero"
           className="sm:col-span-2"
-          disabled={busy || !hasDeposit}
+          disabled={busy || !canWithdraw}
         >
           {busy ? "Submitting…" : `Request ${usd(amount)}`}
         </Button>

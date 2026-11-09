@@ -54,11 +54,11 @@ function DepositPage() {
   const [busy, setBusy] = useState(false);
 
   const selectedCoin = cryptoNetworks.find((c) => c.code === coin)!;
-  const hasAnyDeposit = deposits.length > 0;
+  const hasDepositRequest = deposits.length > 0;
   const fundingRequirements = getFundingRequirements(
     Number(profile?.wallet_balance ?? 0),
     lang,
-    hasAnyDeposit,
+    hasDepositRequest,
   );
   const minDeposit = fundingRequirements.firstDepositMinimum || 1;
 
@@ -136,7 +136,7 @@ function DepositPage() {
               onChange={(e) => setAmount(Math.max(0, Number(e.target.value)))}
               required
             />
-            {!hasAnyDeposit && (
+            {!hasDepositRequest && (
               <p className="text-xs text-muted-foreground">
                 {fundingRequirements.firstDepositMinimum === 200
                   ? t("deposit.highBalanceMinimum")
