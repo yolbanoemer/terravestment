@@ -15,6 +15,13 @@
       "when": 1793972349640,
       "tag": "0001_deposit_first_minimums",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794218581310,
+      "tag": "0002_count_any_deposit_for_rules",
+      "breakpoints": true
     }
   ]
 }
