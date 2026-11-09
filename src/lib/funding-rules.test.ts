@@ -6,16 +6,16 @@ import { resolvePreferredLanguage } from "./language-preference";
 describe("first-deposit and withdrawal rules", () => {
   it("requires a $100 first deposit for English accounts below the high-balance threshold", () => {
     assert.deepEqual(getFundingRequirements(10_000, "en", false), {
-      canWithdraw: false,
       depositCurrency: "USD",
+      canWithdraw: false,
       firstDepositMinimum: 100,
     });
   });
 
   it("requires a €100 first deposit for German accounts below the high-balance threshold", () => {
     assert.deepEqual(getFundingRequirements(10_000, "de", false), {
-      canWithdraw: false,
       depositCurrency: "EUR",
+      canWithdraw: false,
       firstDepositMinimum: 100,
     });
   });
@@ -31,6 +31,11 @@ describe("first-deposit and withdrawal rules", () => {
   it("uses the language’s funding currency while leaving deposit-request eligibility separate", () => {
     assert.equal(getFundingRequirements(500, "en", false).depositCurrency, "USD");
     assert.equal(getFundingRequirements(500, "de", false).depositCurrency, "EUR");
+  });
+
+  it("allows withdrawal after any deposit request without requiring confirmation or investment", () => {
+    assert.equal(getFundingRequirements(500, "en", false).canWithdraw, false);
+    assert.equal(getFundingRequirements(500, "en", true).canWithdraw, true);
   });
 
   it("defaults to German for a German IP country and English otherwise", () => {
